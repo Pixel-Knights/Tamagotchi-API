@@ -45,4 +45,20 @@ public class TamagochiResource {
         }
     }
 
+    @PutMapping// PUT http://localhost:8080/api/tamagochi
+    public ResponseEntity<Tamagochi> update(@RequestBody Tamagochi tamagochi){
+
+        Tamagochi updTamagochi = tamagochiService.update(tamagochi);
+
+        return ResponseEntity.ok(updTamagochi);
+    }
+
+    @DeleteMapping("/{id}")// DELETE http://localhost:8080/api/tamagochi/{id}
+    public ResponseEntity<?> delete(@PathVariable Long id){
+
+        tamagochiService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
