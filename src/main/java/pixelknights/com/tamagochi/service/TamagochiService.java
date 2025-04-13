@@ -1,14 +1,17 @@
 package pixelknights.com.tamagochi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pixelknights.com.tamagochi.Enum.Estado;
 import pixelknights.com.tamagochi.exception.BadRequestException;
 import pixelknights.com.tamagochi.exception.InternalServerException;
 import pixelknights.com.tamagochi.exception.NotFoundException;
 import pixelknights.com.tamagochi.model.Tamagochi;
 import pixelknights.com.tamagochi.repository.TamagochiRepository;
 
-import java.util.ArrayList;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,6 +113,34 @@ public class TamagochiService {
     public void delete(Long id){
 
         tamagochiRepository.deleteById(id);
+    }
+
+    //Verificação e edição de banco
+    //Vai consultar o banco de dados a respeito do tamagochi
+    // e alterar seus estados de acordo com o tempo passado
+    @Scheduled(cron = "0 * * * * *")
+    public void verificarEstadoTamagochi(){
+        Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(1L);
+
+        if (findTamagochi != null){
+            Tamagochi tamagochi = findTamagochi.get();
+
+            Duration timeNoClean = Duration.between(tamagochi.getLast_clean(),LocalDateTime.now());
+            Duration timeNoSleep = Duration.between(tamagochi.getLast_sleep(),LocalDateTime.now());
+            Duration timeNoPlay = Duration.between(tamagochi.getLast_play(),LocalDateTime.now());
+            Duration timeNoFeed = Duration.between(tamagochi.getLast_feed(),LocalDateTime.now());
+
+            if (timeNoClean.toHours() > 4){
+                System.out.println(timeNoClean.toHours());
+                tamagochi.setHigiene(Estado.ruim);
+                update(tamagochi);
+            }
+
+        }
+
+
+
+
     }
 
 

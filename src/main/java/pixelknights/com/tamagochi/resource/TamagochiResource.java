@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import pixelknights.com.tamagochi.model.Tamagochi;
 import pixelknights.com.tamagochi.service.TamagochiService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

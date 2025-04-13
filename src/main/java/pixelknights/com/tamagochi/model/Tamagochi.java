@@ -1,17 +1,14 @@
 package pixelknights.com.tamagochi.model;
 
 import jakarta.persistence.*;
+import pixelknights.com.tamagochi.Enum.Estado;
+import pixelknights.com.tamagochi.Enum.TipoTamagochi;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tamagochi")
 public class Tamagochi {
-
-    //Cria um enum com possiveis tipos de tamagochi
-    private enum TipoTamagochi { gato, cachorro, corvo, dragao };
-    //Cria um enum com possíveis tipos de estado para as necessidades do bichinho
-    private enum Estado { pessimo, ruim, normal, bom, otimo }
 
     @Id //Define como ID/ Chave primária no banco
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Define autoincremento
@@ -31,16 +28,16 @@ public class Tamagochi {
     private int horasDormidas;
 
     @Column(nullable = false)
-    private Timestamp last_sleep;
+    private LocalDateTime last_sleep;
 
     @Column(nullable = false)
-    private Timestamp last_feed;
+    private LocalDateTime last_feed;
 
     @Column(nullable = false)
-    private Timestamp last_clean;
+    private LocalDateTime last_clean;
 
     @Column(nullable = false)
-    private Timestamp last_play;
+    private LocalDateTime last_play;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -69,10 +66,10 @@ public class Tamagochi {
         this.higiene = higiene;
         this.sono = sono;
         this.fome = fome;
-        this.last_clean = new Timestamp(System.currentTimeMillis());
-        this.last_feed = new Timestamp(System.currentTimeMillis());
-        this.last_play = new Timestamp(System.currentTimeMillis());
-        this.last_sleep = new Timestamp(System.currentTimeMillis());
+        this.last_clean = LocalDateTime.now();
+        this.last_feed = LocalDateTime.now();
+        this.last_play = LocalDateTime.now();
+        this.last_sleep = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -103,35 +100,35 @@ public class Tamagochi {
         this.horasDormidas = horasDormidas;
     }
 
-    public Timestamp getLast_sleep() {
+    public LocalDateTime getLast_sleep() {
         return last_sleep;
     }
 
-    public void setLast_sleep(Timestamp last_sleep) {
+    public void setLast_sleep(LocalDateTime last_sleep) {
         this.last_sleep = last_sleep;
     }
 
-    public Timestamp getLast_feed() {
+    public LocalDateTime getLast_feed() {
         return last_feed;
     }
 
-    public void setLast_feed(Timestamp last_feed) {
+    public void setLast_feed(LocalDateTime last_feed) {
         this.last_feed = last_feed;
     }
 
-    public Timestamp getLast_clean() {
+    public LocalDateTime getLast_clean() {
         return last_clean;
     }
 
-    public void setLast_clean(Timestamp last_clean) {
+    public void setLast_clean(LocalDateTime last_clean) {
         this.last_clean = last_clean;
     }
 
-    public Timestamp getLast_play() {
+    public LocalDateTime getLast_play() {
         return last_play;
     }
 
-    public void setLast_play(Timestamp last_play) {
+    public void setLast_play(LocalDateTime last_play) {
         this.last_play = last_play;
     }
 
