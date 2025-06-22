@@ -122,7 +122,7 @@ public class TamagochiService {
     public void verificarEstadoTamagochi(){
         Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(1L);
 
-        if (findTamagochi != null){
+        if (findTamagochi.isEmpty()){
             Tamagochi tamagochi = findTamagochi.get();
 
             Duration timeNoClean = Duration.between(tamagochi.getLast_clean(),LocalDateTime.now());

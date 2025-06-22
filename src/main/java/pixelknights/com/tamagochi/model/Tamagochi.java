@@ -3,6 +3,7 @@ package pixelknights.com.tamagochi.model;
 import jakarta.persistence.*;
 import pixelknights.com.tamagochi.Enum.Estado;
 import pixelknights.com.tamagochi.Enum.TipoTamagochi;
+import pixelknights.com.tamagochi.dto.TamagochiDTO;
 
 import java.time.LocalDateTime;
 
@@ -57,15 +58,15 @@ public class Tamagochi {
 
     public Tamagochi() {}
 
-    public Tamagochi(String nome, TipoTamagochi tipoTamagochi, Estado humor, Estado higiene, Estado sono, Estado fome) {
-        this.nome = nome;
-        this.tipoTamagochi = tipoTamagochi;
+    public Tamagochi(TamagochiDTO tamagochiDTO) {
+        this.nome = tamagochiDTO.nome();
+        this.tipoTamagochi = tamagochiDTO.tipoTamagochi();
         this.acordado = true;
         this.horasDormidas = 8;
-        this.humor = humor;
-        this.higiene = higiene;
-        this.sono = sono;
-        this.fome = fome;
+        this.humor = Estado.normal;
+        this.higiene = Estado.normal;
+        this.sono = Estado.normal;
+        this.fome = Estado.normal;
         this.last_clean = LocalDateTime.now();
         this.last_feed = LocalDateTime.now();
         this.last_play = LocalDateTime.now();

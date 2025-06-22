@@ -3,6 +3,7 @@ package pixelknights.com.tamagochi.resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pixelknights.com.tamagochi.dto.TamagochiDTO;
 import pixelknights.com.tamagochi.model.Tamagochi;
 import pixelknights.com.tamagochi.service.TamagochiService;
 
@@ -16,9 +17,11 @@ public class TamagochiResource {
     private TamagochiService tamagochiService;
 
     @PostMapping// POST http://localhost:8080/api/tamagochi
-    public ResponseEntity<Tamagochi> save(@RequestBody Tamagochi tamagochi){
+    public ResponseEntity<Tamagochi> save(@RequestBody TamagochiDTO tamagochiDTO){
 
-        Tamagochi newTamagochi = tamagochiService.save(tamagochi);
+        Tamagochi newTamagochi = new Tamagochi(tamagochiDTO);
+
+        tamagochiService.save(newTamagochi);
 
         return ResponseEntity.ok(newTamagochi);
     }
@@ -45,9 +48,11 @@ public class TamagochiResource {
     }
 
     @PutMapping// PUT http://localhost:8080/api/tamagochi
-    public ResponseEntity<Tamagochi> update(@RequestBody Tamagochi tamagochi){
+    public ResponseEntity<Tamagochi> update(@RequestBody TamagochiDTO tamagochiDTO){
 
-        Tamagochi updTamagochi = tamagochiService.update(tamagochi);
+        Tamagochi updTamagochi = new Tamagochi(tamagochiDTO);
+
+        tamagochiService.update(updTamagochi);
 
         return ResponseEntity.ok(updTamagochi);
     }
