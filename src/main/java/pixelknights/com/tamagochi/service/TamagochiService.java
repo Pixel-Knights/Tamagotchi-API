@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pixelknights.com.tamagochi.Enum.Estado;
+import pixelknights.com.tamagochi.dto.TamagochiDTO;
 import pixelknights.com.tamagochi.exception.BadRequestException;
 import pixelknights.com.tamagochi.exception.InternalServerException;
 import pixelknights.com.tamagochi.exception.NotFoundException;
@@ -22,19 +23,18 @@ public class TamagochiService {
     private TamagochiRepository tamagochiRepository;
 
     //CRUD - Create - Cria um novo bichinho
-    public Tamagochi save(Tamagochi tamagochi){
-        //if (tamagochi.getId() != null){
-        //    throw new BadRequestException("O ID não deve ser passado ao salvar o novo bichinho");
-        //}
-        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
-        if (tamagochi.getNome() == null){
+    public Tamagochi save(TamagochiDTO tamagochiDTO){
+
+        //Os campos do DTO são obrigatórios, caso estejam vazios, deve ser apontado erro
+        if (tamagochiDTO.nome() == null){
             throw new BadRequestException("O Nome do bichinho não deve estar vazio");
         }
-        if (tamagochi.getTipoTamagochi() == null){
+        if (tamagochiDTO.tipoTamagochi() == null){
             throw new BadRequestException("O tipo do bichinho não deve estar vazio");
         }
         //Tenta salvar registro no banco e aponta erros se houver
         try {
+            Tamagochi tamagochi = new Tamagochi(tamagochiDTO);
             return tamagochiRepository.save(tamagochi);
         }
         catch (Exception e){
@@ -67,9 +67,9 @@ public class TamagochiService {
         Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(tamagochi.getId());
 
         //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
-        //if (tamagochi.getNome() == null){
-        //    throw new BadRequestException("O Nome do bichinho não deve estar vazio");
-        //}
+        if (tamagochi.getNome() == null){
+            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
+        }
         if (tamagochi.getTipoTamagochi() == null){
             throw new BadRequestException("O tipo do bichinho não deve estar vazio");
         }
@@ -96,10 +96,6 @@ public class TamagochiService {
             }
         }
 
-        //Se não existe o registro, um registro novo é criado
-        //else if (tamagochi.getId() != null){
-        //    throw new BadRequestException("O ID não deve ser passado ao salvar o novo bichinho");
-        //}
         else {
             try {
                 return tamagochiRepository.save(tamagochi);
@@ -111,18 +107,16 @@ public class TamagochiService {
 
     //CRUD - Delete - Deeleta registro por ID
     public void delete(Long id){
-
         tamagochiRepository.deleteById(id);
     }
 
     //Verificação e edição de banco
     //Vai consultar o banco de dados a respeito do tamagochi
     // e alterar seus estados de acordo com o tempo passado
-    @Scheduled(cron = "0 * * * * *")
-    public void verificarEstadoTamagochi(){
-        Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(1L);
+    public void verificarEstadoTamagochi(Long id){
+        Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(id);
 
-        if (findTamagochi.isEmpty()){
+        if (findTamagochi.isPresent()){
             Tamagochi tamagochi = findTamagochi.get();
 
             Duration timeNoClean = Duration.between(tamagochi.getLast_clean(),LocalDateTime.now());

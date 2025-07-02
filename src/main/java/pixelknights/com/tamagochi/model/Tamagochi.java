@@ -1,5 +1,6 @@
 package pixelknights.com.tamagochi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import pixelknights.com.tamagochi.Enum.Estado;
 import pixelknights.com.tamagochi.Enum.TipoTamagochi;
@@ -24,9 +25,6 @@ public class Tamagochi {
 
     @Column(nullable = false)
     private boolean acordado;
-
-    @Column(nullable = false)
-    private int horasDormidas;
 
     @Column(nullable = false)
     private LocalDateTime last_sleep;
@@ -56,13 +54,16 @@ public class Tamagochi {
     @Column(nullable = false)
     private Estado fome;
 
+    @JsonIgnore
+    @ManyToOne
+    private Usuario usuario;
+
     public Tamagochi() {}
 
     public Tamagochi(TamagochiDTO tamagochiDTO) {
         this.nome = tamagochiDTO.nome();
         this.tipoTamagochi = tamagochiDTO.tipoTamagochi();
         this.acordado = true;
-        this.horasDormidas = 8;
         this.humor = Estado.normal;
         this.higiene = Estado.normal;
         this.sono = Estado.normal;
@@ -91,14 +92,6 @@ public class Tamagochi {
 
     public void setAcordado(boolean acordado) {
         this.acordado = acordado;
-    }
-
-    public int getHorasDormidas() {
-        return horasDormidas;
-    }
-
-    public void setHorasDormidas(int horasDormidas) {
-        this.horasDormidas = horasDormidas;
     }
 
     public LocalDateTime getLast_sleep() {

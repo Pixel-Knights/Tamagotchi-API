@@ -19,9 +19,7 @@ public class TamagochiResource {
     @PostMapping// POST http://localhost:8080/api/tamagochi
     public ResponseEntity<Tamagochi> save(@RequestBody TamagochiDTO tamagochiDTO){
 
-        Tamagochi newTamagochi = new Tamagochi(tamagochiDTO);
-
-        tamagochiService.save(newTamagochi);
+        Tamagochi newTamagochi = tamagochiService.save(tamagochiDTO);
 
         return ResponseEntity.ok(newTamagochi);
     }
