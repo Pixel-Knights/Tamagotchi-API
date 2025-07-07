@@ -9,7 +9,7 @@ import pixelknights.com.tamagochi.dto.TamagochiDTO;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tamagochi")
+@Table(name = "TAMAGOCHI")
 public class Tamagochi {
 
     @Id //Define como ID/ Chave primária no banco

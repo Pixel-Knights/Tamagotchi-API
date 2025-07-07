@@ -6,6 +6,8 @@ import pixelknights.com.tamagochi.dto.UsuarioDTO;
 
 import java.util.List;
 
+@Entity
+@Table(name = "USUARIO")
 public class Usuario {
     @Id //Define como ID/ Chave primária no banco
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Define autoincremento
