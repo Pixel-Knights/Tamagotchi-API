@@ -1,13 +1,12 @@
 package pixelknights.com.tamagochi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pixelknights.com.tamagochi.Enum.Estado;
 import pixelknights.com.tamagochi.dto.TamagochiDTO;
-import pixelknights.com.tamagochi.exception.BadRequestException;
-import pixelknights.com.tamagochi.exception.InternalServerException;
-import pixelknights.com.tamagochi.exception.NotFoundException;
+import pixelknights.com.tamagochi.infra.exception.BadRequestException;
+import pixelknights.com.tamagochi.infra.exception.InternalServerException;
+import pixelknights.com.tamagochi.infra.exception.NotFoundException;
 import pixelknights.com.tamagochi.model.Tamagochi;
 import pixelknights.com.tamagochi.repository.TamagochiRepository;
 

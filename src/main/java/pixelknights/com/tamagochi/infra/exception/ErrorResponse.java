@@ -1,4 +1,4 @@
-package pixelknights.com.tamagochi.exception;
+package pixelknights.com.tamagochi.infra.exception;
 
 public class ErrorResponse {
     private String message;

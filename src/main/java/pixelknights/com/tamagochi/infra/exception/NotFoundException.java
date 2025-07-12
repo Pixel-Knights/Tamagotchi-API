@@ -1,4 +1,4 @@
-package pixelknights.com.tamagochi.exception;
+package pixelknights.com.tamagochi.infra.exception;
 
 public class NotFoundException extends RuntimeException{
     public NotFoundException(String message) {

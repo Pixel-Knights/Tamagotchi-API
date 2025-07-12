@@ -1,29 +1,29 @@
 package pixelknights.com.tamagochi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import pixelknights.com.tamagochi.Enum.Estado;
-import pixelknights.com.tamagochi.dto.TamagochiDTO;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import pixelknights.com.tamagochi.dto.UsuarioCriacaoDTO;
 import pixelknights.com.tamagochi.dto.UsuarioDTO;
-import pixelknights.com.tamagochi.exception.BadRequestException;
-import pixelknights.com.tamagochi.exception.InternalServerException;
-import pixelknights.com.tamagochi.exception.NotFoundException;
-import pixelknights.com.tamagochi.model.Tamagochi;
+import pixelknights.com.tamagochi.infra.exception.BadRequestException;
+import pixelknights.com.tamagochi.infra.exception.InternalServerException;
+import pixelknights.com.tamagochi.infra.exception.NotFoundException;
 import pixelknights.com.tamagochi.model.Usuario;
 import pixelknights.com.tamagochi.repository.UsuarioRepository;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UsuarioService {
+@Service
+public class UsuarioService implements UserDetailsService {
 
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    //CRUD - Create - Cria um novo bichinho
+    //CRUD - Create - Cria um novo usuário
     public UsuarioDTO save(UsuarioCriacaoDTO usuarioCriacaoDTO){
 
         //Os campos do DTO são obrigatórios, caso estejam vazios, deve ser apontado erro
@@ -80,7 +80,7 @@ public class UsuarioService {
         Optional<Usuario> findUsuario = usuarioRepository.findById(usuario.getId());
 
         //Os campos do DTO são obrigatórios, caso estejam vazios, deve ser apontado erro
-        if (usuario.getUserName() == null){
+        if (usuario.getUsername() == null){
             throw new BadRequestException("O Nome do usuário não pode estar vazio");
         }
         if (usuario.getEmail() == null){
@@ -97,9 +97,9 @@ public class UsuarioService {
             Usuario updUsuario = findUsuario.get();
 
             //Atualiza o registro existente com os dados novos
-            updUsuario.setUserName(usuario.getUserName());
+            updUsuario.setUserName(usuario.getUsername());
             updUsuario.setEmail(usuario.getEmail());
-            updUsuario.setSenha(usuario.getSenha());
+            updUsuario.setSenha(usuario.getPassword());
 
             //Tenta salvar registro no banco e aponta erros se houver
             try {
@@ -124,5 +124,11 @@ public class UsuarioService {
     //CRUD - Delete - Deeleta registro por ID
     public void delete(Long id){
         usuarioRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return usuarioRepository.findByEmailIgnoreCase(username)
+                .orElseThrow(() -> new UsernameNotFoundException("O usuário não foi encontrado!"));
     }
 }

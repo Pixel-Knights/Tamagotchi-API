@@ -1,4 +1,4 @@
-package pixelknights.com.tamagochi.exception;
+package pixelknights.com.tamagochi.infra.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

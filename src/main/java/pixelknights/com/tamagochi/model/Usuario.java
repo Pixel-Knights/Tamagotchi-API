@@ -1,14 +1,17 @@
 package pixelknights.com.tamagochi.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import pixelknights.com.tamagochi.dto.UsuarioCriacaoDTO;
 import pixelknights.com.tamagochi.dto.UsuarioDTO;
 
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "USUARIO")
-public class Usuario {
+public class Usuario implements UserDetails {
     @Id //Define como ID/ Chave primária no banco
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Define autoincremento
     private Long id;
@@ -46,10 +49,6 @@ public class Usuario {
         return tamagochis;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -62,11 +61,22 @@ public class Usuario {
         this.email = email;
     }
 
-    public String getSenha() {
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getPassword() {
         return senha;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    @Override
+    public String getUsername() {
+        return userName;
     }
 }

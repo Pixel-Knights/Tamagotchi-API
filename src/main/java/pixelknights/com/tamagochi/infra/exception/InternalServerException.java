@@ -1,4 +1,4 @@
-package pixelknights.com.tamagochi.exception;
+package pixelknights.com.tamagochi.infra.exception;
 
 public class InternalServerException extends RuntimeException{
     public InternalServerException(String message) {
