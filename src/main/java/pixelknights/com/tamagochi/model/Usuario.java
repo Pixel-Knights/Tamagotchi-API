@@ -75,8 +75,12 @@ public class Usuario implements UserDetails {
         return senha;
     }
 
+    public String getUser(){
+        return userName;
+    }
+
     @Override
     public String getUsername() {
-        return userName;
+        return email;
     }
 }

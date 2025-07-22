@@ -50,7 +50,8 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
     private String recuperarTokenRequisicao(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null){
-            authorizationHeader.replace("Bearer ", "");
+            authorizationHeader = authorizationHeader.replace("Bearer ", "");
+            System.out.println("=======================================\n" + authorizationHeader + "\n=======================================");
             return authorizationHeader;
         }
         return null;

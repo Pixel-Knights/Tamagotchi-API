@@ -23,11 +23,11 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256("12345678");
             return JWT.create()
                     .withIssuer("Tamagochi")
-                    .withSubject(usuario.getUsername())
+                    .withSubject(usuario.getEmail())
                     .withExpiresAt(expiracao(30))
                     .sign(algorithm);
         } catch (JWTCreationException exception){
-            throw new InternalServerException("Não foi possível criar token JWT");
+            throw new InternalServerException("Não foi possível criar token JWT" + exception.getMessage());
         }
     }
 
@@ -46,7 +46,7 @@ public class TokenService {
             decodedJWT = verifier.verify(token);
             return decodedJWT.getSubject();
         } catch (JWTVerificationException exception){
-            throw new InternalServerException("Erro ao verificar token JWT de acesso!");
+            throw new InternalServerException("Erro ao verificar token JWT de acesso!" + exception.getMessage());
         }
     }
 }
