@@ -51,7 +51,6 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null){
             authorizationHeader = authorizationHeader.replace("Bearer ", "");
-            System.out.println("=======================================\n" + authorizationHeader + "\n=======================================");
             return authorizationHeader;
         }
         return null;
