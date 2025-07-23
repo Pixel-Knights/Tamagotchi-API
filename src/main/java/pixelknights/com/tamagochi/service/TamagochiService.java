@@ -44,8 +44,10 @@ public class TamagochiService {
     //CRUD - Read - Retorna pessoa pelo ID
     public Tamagochi findById(Long id){
         try {
-            return tamagochiRepository.findById(id)
+            Tamagochi tamagochi = tamagochiRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("tamagochi com ID " + id + " não encontrado"));
+
+            return verificarEstadoTamagochi(tamagochi);
         } catch (NotFoundException e) {
             throw e;
         }
@@ -112,28 +114,133 @@ public class TamagochiService {
     //Verificação e edição de banco
     //Vai consultar o banco de dados a respeito do tamagochi
     // e alterar seus estados de acordo com o tempo passado
-    public void verificarEstadoTamagochi(Long id){
-        Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(id);
+    public Tamagochi verificarEstadoTamagochi(Tamagochi tamagochi){
 
-        if (findTamagochi.isPresent()){
-            Tamagochi tamagochi = findTamagochi.get();
+        tamagochi = defineEstadosTamagochi(tamagochi, "sono", 8,16,20,24,30);
+        tamagochi = defineEstadosTamagochi(tamagochi, "fome", 3,5,7,12,20);
+        tamagochi = defineEstadosTamagochi(tamagochi, "humor", 5,10,15,20,30);
+        tamagochi = defineEstadosTamagochi(tamagochi, "higiene", 12,24,36,48,60);
 
-            Duration timeNoClean = Duration.between(tamagochi.getLast_clean(),LocalDateTime.now());
-            Duration timeNoSleep = Duration.between(tamagochi.getLast_sleep(),LocalDateTime.now());
-            Duration timeNoPlay = Duration.between(tamagochi.getLast_play(),LocalDateTime.now());
-            Duration timeNoFeed = Duration.between(tamagochi.getLast_feed(),LocalDateTime.now());
+        return tamagochi;
+    }
 
-            if (timeNoClean.toHours() > 4){
-                System.out.println(timeNoClean.toHours());
-                tamagochi.setHigiene(Estado.ruim);
-                update(tamagochi);
-            }
+    public Tamagochi defineEstadosTamagochi(Tamagochi tamagochi, String status, int horasOtimo, int horasBom, int horasOK, int horasRuim, int horasPessimo){
 
+        Duration timeNoClean = Duration.between(tamagochi.getLast_clean(),LocalDateTime.now());
+        Duration timeNoSleep = Duration.between(tamagochi.getLast_sleep(),LocalDateTime.now());
+        Duration timeNoPlay = Duration.between(tamagochi.getLast_play(),LocalDateTime.now());
+        Duration timeNoFeed = Duration.between(tamagochi.getLast_feed(),LocalDateTime.now());
+
+        switch (status){
+
+            case "fome":
+                if (timeNoFeed.toHours() < horasOtimo){
+                    tamagochi.setFome(Estado.otimo);
+                    update(tamagochi);
+                }
+                else if (timeNoFeed.toHours() < horasBom) {
+                    tamagochi.setFome(Estado.bom);
+                    update(tamagochi);
+                }
+
+                else if (timeNoFeed.toHours() < horasOK) {
+                    tamagochi.setFome(Estado.normal);
+                    update(tamagochi);
+                }
+
+                else if (timeNoFeed.toHours() < horasRuim) {
+                    tamagochi.setFome(Estado.ruim);
+                    update(tamagochi);
+                }
+
+                else {
+                    tamagochi.setFome(Estado.pessimo);
+                    update(tamagochi);
+                }
+                break;
+
+            case "sono":
+                if (timeNoSleep.toHours() < horasOtimo){
+                    tamagochi.setSono(Estado.otimo);
+                    update(tamagochi);
+                }
+                else if (timeNoSleep.toHours() < horasBom) {
+                    tamagochi.setSono(Estado.bom);
+                    update(tamagochi);
+                }
+
+                else if (timeNoSleep.toHours() < horasOK) {
+                    tamagochi.setSono(Estado.normal);
+                    update(tamagochi);
+                }
+
+                else if (timeNoSleep.toHours() < horasRuim) {
+                    tamagochi.setSono(Estado.ruim);
+                    update(tamagochi);
+                }
+
+                else {
+                    tamagochi.setSono(Estado.pessimo);
+                    update(tamagochi);
+                }
+                break;
+
+            case "humor":
+                if (timeNoPlay.toHours() < horasOtimo){
+                    tamagochi.setHumor(Estado.otimo);
+                    update(tamagochi);
+                }
+                else if (timeNoPlay.toHours() < horasBom) {
+                    tamagochi.setHumor(Estado.bom);
+                    update(tamagochi);
+                }
+
+                else if (timeNoPlay.toHours() < horasOK) {
+                    tamagochi.setHumor(Estado.normal);
+                    update(tamagochi);
+                }
+
+                else if (timeNoPlay.toHours() < horasRuim) {
+                    tamagochi.setHumor(Estado.ruim);
+                    update(tamagochi);
+                }
+
+                else {
+                    tamagochi.setHumor(Estado.pessimo);
+                    update(tamagochi);
+                }
+                break;
+
+            case "higiene":
+                if (timeNoClean.toHours() < horasOtimo){
+                    tamagochi.setHigiene(Estado.otimo);
+                    update(tamagochi);
+                }
+                else if (timeNoClean.toHours() < horasBom) {
+                    tamagochi.setHigiene(Estado.bom);
+                    update(tamagochi);
+                }
+
+                else if (timeNoClean.toHours() < horasOK) {
+                    tamagochi.setHigiene(Estado.normal);
+                    update(tamagochi);
+                }
+
+                else if (timeNoClean.toHours() < horasRuim) {
+                    tamagochi.setHigiene(Estado.ruim);
+                    update(tamagochi);
+                }
+
+                else {
+                    tamagochi.setHigiene(Estado.pessimo);
+                    update(tamagochi);
+                }
+                break;
+
+            default:
+                break;
         }
-
-
-
-
+        return tamagochi;
     }
 
 
