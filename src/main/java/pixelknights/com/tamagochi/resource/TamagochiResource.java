@@ -33,9 +33,9 @@ public class TamagochiResource {
     }
 
     @GetMapping// GET http://localhost:8080/api/tamagochi
-    public  ResponseEntity<List<Tamagochi>> list(){
+    public  ResponseEntity<List<Tamagochi>> listTamagochisByUsuario(){
 
-        List<Tamagochi> tamagochis = tamagochiService.findAll();
+        List<Tamagochi> tamagochis = tamagochiService.findTamagochisByUsuario();
 
         if (tamagochis.isEmpty()){
             return ResponseEntity.noContent().build();
@@ -45,15 +45,15 @@ public class TamagochiResource {
         }
     }
 
-    @PutMapping// PUT http://localhost:8080/api/tamagochi
-    public ResponseEntity<Tamagochi> update(@RequestBody TamagochiDTO tamagochiDTO){
-
-        Tamagochi updTamagochi = new Tamagochi(tamagochiDTO);
-
-        tamagochiService.update(updTamagochi);
-
-        return ResponseEntity.ok(updTamagochi);
-    }
+    //@PutMapping// PUT http://localhost:8080/api/tamagochi
+    //public ResponseEntity<Tamagochi> update(@RequestBody TamagochiDTO tamagochiDTO){
+    //
+    //    Tamagochi updTamagochi = new Tamagochi(tamagochiDTO);
+    //
+    //    tamagochiService.update(updTamagochi);
+    //
+    //    return ResponseEntity.ok(updTamagochi);
+    //}
 
     @DeleteMapping("/{id}")// DELETE http://localhost:8080/api/tamagochi/{id}
     public ResponseEntity<?> delete(@PathVariable Long id){

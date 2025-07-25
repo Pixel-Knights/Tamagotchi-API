@@ -60,7 +60,7 @@ public class Tamagochi {
 
     public Tamagochi() {}
 
-    public Tamagochi(TamagochiDTO tamagochiDTO) {
+    public Tamagochi(TamagochiDTO tamagochiDTO, Usuario usuario) {
         this.nome = tamagochiDTO.nome();
         this.tipoTamagochi = tamagochiDTO.tipoTamagochi();
         this.acordado = true;
@@ -72,6 +72,7 @@ public class Tamagochi {
         this.last_feed = LocalDateTime.now();
         this.last_play = LocalDateTime.now();
         this.last_sleep = LocalDateTime.now();
+        this.usuario = usuario;
     }
 
     public Long getId() {

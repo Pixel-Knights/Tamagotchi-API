@@ -1,6 +1,7 @@
 package pixelknights.com.tamagochi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pixelknights.com.tamagochi.Enum.Estado;
 import pixelknights.com.tamagochi.dto.TamagochiDTO;
@@ -8,7 +9,9 @@ import pixelknights.com.tamagochi.infra.exception.BadRequestException;
 import pixelknights.com.tamagochi.infra.exception.InternalServerException;
 import pixelknights.com.tamagochi.infra.exception.NotFoundException;
 import pixelknights.com.tamagochi.model.Tamagochi;
+import pixelknights.com.tamagochi.model.Usuario;
 import pixelknights.com.tamagochi.repository.TamagochiRepository;
+import pixelknights.com.tamagochi.repository.UsuarioRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -19,21 +22,25 @@ import java.util.Optional;
 public class TamagochiService {
 
     @Autowired
-    private TamagochiRepository tamagochiRepository;
+    private final TamagochiRepository tamagochiRepository;
+
+    @Autowired
+    private final UsuarioRepository usuarioRepository;
+
+    public TamagochiService(TamagochiRepository tamagochiRepository, UsuarioRepository usuarioRepository) {
+        this.tamagochiRepository = tamagochiRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     //CRUD - Create - Cria um novo bichinho
     public Tamagochi save(TamagochiDTO tamagochiDTO){
 
-        //Os campos do DTO são obrigatórios, caso estejam vazios, deve ser apontado erro
-        if (tamagochiDTO.nome() == null){
-            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
-        }
-        if (tamagochiDTO.tipoTamagochi() == null){
-            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
-        }
+        validarTamagochi(tamagochiDTO);
+
         //Tenta salvar registro no banco e aponta erros se houver
         try {
-            Tamagochi tamagochi = new Tamagochi(tamagochiDTO);
+            Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Tamagochi tamagochi = new Tamagochi(tamagochiDTO, usuario);
             return tamagochiRepository.save(tamagochi);
         }
         catch (Exception e){
@@ -57,23 +64,19 @@ public class TamagochiService {
     }
 
     //CRUD - Read - Retorna todos os registros de pessoa
-    public List<Tamagochi> findAll(){
-        return tamagochiRepository.findAll();
+    public List<Tamagochi> findTamagochisByUsuario(){
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return tamagochiRepository.findByUsuario(usuario);
     }
 
     //CRUD - Update - Edita os dados de um registro ou cria um novo
     public Tamagochi update(Tamagochi tamagochi){
 
+        validarTamagochi(tamagochi);
+
         //procura um registro com mesmo ID do passado por requisição
         Optional<Tamagochi> findTamagochi = tamagochiRepository.findById(tamagochi.getId());
 
-        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
-        if (tamagochi.getNome() == null){
-            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
-        }
-        if (tamagochi.getTipoTamagochi() == null){
-            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
-        }
 
         //Se o registro já existe
         if (findTamagochi.isPresent()){
@@ -121,126 +124,61 @@ public class TamagochiService {
         tamagochi = defineEstadosTamagochi(tamagochi, "humor", 5,10,15,20,30);
         tamagochi = defineEstadosTamagochi(tamagochi, "higiene", 12,24,36,48,60);
 
+        return update(tamagochi);
+    }
+
+    public void validarTamagochi(TamagochiDTO tamagochi){
+        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
+        if (tamagochi.nome() == null){
+            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
+        }
+        if (tamagochi.tipoTamagochi() == null){
+            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
+        }
+    }
+
+    public void validarTamagochi(Tamagochi tamagochi){
+        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
+        if (tamagochi.getNome() == null){
+            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
+        }
+        if (tamagochi.getTipoTamagochi() == null){
+            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
+        }
+    }
+
+    public Tamagochi defineEstadosTamagochi(Tamagochi tamagochi, String status, int otimo, int bom, int normal, int ruim, int pessimo){
+
+        long horas;
+
+        switch (status) {
+            case "sono":
+                horas = Duration.between(tamagochi.getLast_sleep(), LocalDateTime.now()).toHours();
+                tamagochi.setSono(calcularEstado(horas, otimo, bom, normal, ruim));
+                break;
+            case "fome":
+                horas = Duration.between(tamagochi.getLast_feed(), LocalDateTime.now()).toHours();
+                tamagochi.setFome(calcularEstado(horas, otimo, bom, normal, ruim));
+                break;
+            case "humor":
+                horas = Duration.between(tamagochi.getLast_play(), LocalDateTime.now()).toHours();
+                tamagochi.setHumor(calcularEstado(horas, otimo, bom, normal, ruim));
+                break;
+            case "higiene":
+                horas = Duration.between(tamagochi.getLast_clean(), LocalDateTime.now()).toHours();
+                tamagochi.setHigiene(calcularEstado(horas, otimo, bom, normal, ruim));
+                break;
+        }
+
         return tamagochi;
     }
 
-    public Tamagochi defineEstadosTamagochi(Tamagochi tamagochi, String status, int horasOtimo, int horasBom, int horasOK, int horasRuim, int horasPessimo){
-
-        Duration timeNoClean = Duration.between(tamagochi.getLast_clean(),LocalDateTime.now());
-        Duration timeNoSleep = Duration.between(tamagochi.getLast_sleep(),LocalDateTime.now());
-        Duration timeNoPlay = Duration.between(tamagochi.getLast_play(),LocalDateTime.now());
-        Duration timeNoFeed = Duration.between(tamagochi.getLast_feed(),LocalDateTime.now());
-
-        switch (status){
-
-            case "fome":
-                if (timeNoFeed.toHours() < horasOtimo){
-                    tamagochi.setFome(Estado.otimo);
-                    update(tamagochi);
-                }
-                else if (timeNoFeed.toHours() < horasBom) {
-                    tamagochi.setFome(Estado.bom);
-                    update(tamagochi);
-                }
-
-                else if (timeNoFeed.toHours() < horasOK) {
-                    tamagochi.setFome(Estado.normal);
-                    update(tamagochi);
-                }
-
-                else if (timeNoFeed.toHours() < horasRuim) {
-                    tamagochi.setFome(Estado.ruim);
-                    update(tamagochi);
-                }
-
-                else {
-                    tamagochi.setFome(Estado.pessimo);
-                    update(tamagochi);
-                }
-                break;
-
-            case "sono":
-                if (timeNoSleep.toHours() < horasOtimo){
-                    tamagochi.setSono(Estado.otimo);
-                    update(tamagochi);
-                }
-                else if (timeNoSleep.toHours() < horasBom) {
-                    tamagochi.setSono(Estado.bom);
-                    update(tamagochi);
-                }
-
-                else if (timeNoSleep.toHours() < horasOK) {
-                    tamagochi.setSono(Estado.normal);
-                    update(tamagochi);
-                }
-
-                else if (timeNoSleep.toHours() < horasRuim) {
-                    tamagochi.setSono(Estado.ruim);
-                    update(tamagochi);
-                }
-
-                else {
-                    tamagochi.setSono(Estado.pessimo);
-                    update(tamagochi);
-                }
-                break;
-
-            case "humor":
-                if (timeNoPlay.toHours() < horasOtimo){
-                    tamagochi.setHumor(Estado.otimo);
-                    update(tamagochi);
-                }
-                else if (timeNoPlay.toHours() < horasBom) {
-                    tamagochi.setHumor(Estado.bom);
-                    update(tamagochi);
-                }
-
-                else if (timeNoPlay.toHours() < horasOK) {
-                    tamagochi.setHumor(Estado.normal);
-                    update(tamagochi);
-                }
-
-                else if (timeNoPlay.toHours() < horasRuim) {
-                    tamagochi.setHumor(Estado.ruim);
-                    update(tamagochi);
-                }
-
-                else {
-                    tamagochi.setHumor(Estado.pessimo);
-                    update(tamagochi);
-                }
-                break;
-
-            case "higiene":
-                if (timeNoClean.toHours() < horasOtimo){
-                    tamagochi.setHigiene(Estado.otimo);
-                    update(tamagochi);
-                }
-                else if (timeNoClean.toHours() < horasBom) {
-                    tamagochi.setHigiene(Estado.bom);
-                    update(tamagochi);
-                }
-
-                else if (timeNoClean.toHours() < horasOK) {
-                    tamagochi.setHigiene(Estado.normal);
-                    update(tamagochi);
-                }
-
-                else if (timeNoClean.toHours() < horasRuim) {
-                    tamagochi.setHigiene(Estado.ruim);
-                    update(tamagochi);
-                }
-
-                else {
-                    tamagochi.setHigiene(Estado.pessimo);
-                    update(tamagochi);
-                }
-                break;
-
-            default:
-                break;
-        }
-        return tamagochi;
+    public Estado calcularEstado(long horas, int otimo, int bom, int normal, int ruim) {
+        if (horas < otimo) return Estado.otimo;
+        else if (horas < bom) return Estado.bom;
+        else if (horas < normal) return Estado.normal;
+        else if (horas < ruim) return Estado.ruim;
+        else return Estado.pessimo;
     }
 
 
