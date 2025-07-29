@@ -37,6 +37,12 @@ public class Usuario implements UserDetails {
         usuario.senha = usuarioCriacaoDTO.senha();
     }
 
+    public Usuario(String userName, String email, String senhaCriptografada){
+        this.userName = userName;
+        this.email = email;
+        this.senha = senhaCriptografada;
+    }
+
     public UsuarioDTO toUsuarioDTO(){
         return new UsuarioDTO(this.id, this.userName, this.email);
     }
