@@ -131,26 +131,6 @@ public class TamagochiService {
         return update(tamagochi);
     }
 
-    public void validarTamagochi(TamagochiDTO tamagochi){
-        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
-        if (tamagochi.nome() == null){
-            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
-        }
-        if (tamagochi.tipoTamagochi() == null){
-            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
-        }
-    }
-
-    public void validarTamagochi(Tamagochi tamagochi){
-        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
-        if (tamagochi.getNome() == null){
-            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
-        }
-        if (tamagochi.getTipoTamagochi() == null){
-            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
-        }
-    }
-
     public Tamagochi defineEstadosTamagochi(Tamagochi tamagochi, String status, int otimo, int bom, int normal, int ruim, int pessimo){
 
         long horas;
@@ -185,7 +165,50 @@ public class TamagochiService {
         else return Estado.pessimo;
     }
 
+    public void validarTamagochi(TamagochiDTO tamagochi){
+        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
+        if (tamagochi.nome() == null){
+            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
+        }
+        if (tamagochi.tipoTamagochi() == null){
+            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
+        }
+    }
+
+    public void validarTamagochi(Tamagochi tamagochi){
+        //Apenas o nome é obrigatório, caso esteja vazio, deve ser apontado erro
+        if (tamagochi.getNome() == null){
+            throw new BadRequestException("O Nome do bichinho não deve estar vazio");
+        }
+        if (tamagochi.getTipoTamagochi() == null){
+            throw new BadRequestException("O tipo do bichinho não deve estar vazio");
+        }
+    }
 
 
+    public Tamagochi cuidar(Long id, String action) {
 
+        Tamagochi tamagochi = findById(id);
+
+        switch (action) {
+            case "sono":
+                tamagochi.setLast_sleep(LocalDateTime.now());
+                verificarEstadoTamagochi(tamagochi);
+                break;
+            case "fome":
+                tamagochi.setLast_feed(LocalDateTime.now());
+                verificarEstadoTamagochi(tamagochi);
+                break;
+            case "humor":
+                tamagochi.setLast_play(LocalDateTime.now());
+                verificarEstadoTamagochi(tamagochi);
+                break;
+            case "higiene":
+                tamagochi.setLast_clean(LocalDateTime.now());
+                verificarEstadoTamagochi(tamagochi);
+                break;
+        }
+
+        return tamagochi;
+    }
 }

@@ -45,22 +45,44 @@ public class TamagochiResource {
         }
     }
 
-    //@PutMapping// PUT http://localhost:8080/api/tamagochi
-    //public ResponseEntity<Tamagochi> update(@RequestBody TamagochiDTO tamagochiDTO){
-    //
-    //    Tamagochi updTamagochi = new Tamagochi(tamagochiDTO);
-    //
-    //    tamagochiService.update(updTamagochi);
-    //
-    //    return ResponseEntity.ok(updTamagochi);
-    //}
-
     @DeleteMapping("/{id}")// DELETE http://localhost:8080/api/tamagochi/{id}
     public ResponseEntity<?> delete(@PathVariable Long id){
 
         tamagochiService.delete(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/feed/{id}")// PUT http://localhost:8080/api/tamagochi/feed/{id}
+    public ResponseEntity<Tamagochi> feedTamagochi(@PathVariable Long id){
+
+        Tamagochi tamagochi = tamagochiService.cuidar(id, "fome");
+
+        return ResponseEntity.ok().body(tamagochi);
+    }
+
+    @PutMapping("/play/{id}")// PUT http://localhost:8080/api/tamagochi/play/{id}
+    public ResponseEntity<Tamagochi> playTamagochi(@PathVariable Long id){
+
+        Tamagochi tamagochi = tamagochiService.cuidar(id, "humor");
+
+        return ResponseEntity.ok().body(tamagochi);
+    }
+
+    @PutMapping("/sleep/{id}")// PUT http://localhost:8080/api/tamagochi/sleep/{id}
+    public ResponseEntity<Tamagochi> sleepTamagochi(@PathVariable Long id){
+
+        Tamagochi tamagochi = tamagochiService.cuidar(id, "sono");
+
+        return ResponseEntity.ok().body(tamagochi);
+    }
+
+    @PutMapping("/clean/{id}")// PUT http://localhost:8080/api/tamagochi/clean/{id}
+    public ResponseEntity<Tamagochi> cleanTamagochi(@PathVariable Long id){
+
+        Tamagochi tamagochi = tamagochiService.cuidar(id, "higiene");
+
+        return ResponseEntity.ok().body(tamagochi);
     }
 
 }
