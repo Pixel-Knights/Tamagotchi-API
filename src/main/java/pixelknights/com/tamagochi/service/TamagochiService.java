@@ -66,7 +66,11 @@ public class TamagochiService {
     //CRUD - Read - Retorna todos os registros de pessoa
     public List<Tamagochi> findTamagochisByUsuario(){
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return tamagochiRepository.findByUsuario(usuario);
+        List<Tamagochi> tamagochis = tamagochiRepository.findByUsuario(usuario);
+        for (Tamagochi tamagochi : tamagochis){
+            verificarEstadoTamagochi(tamagochi);
+        }
+        return tamagochis;
     }
 
     //CRUD - Update - Edita os dados de um registro ou cria um novo
