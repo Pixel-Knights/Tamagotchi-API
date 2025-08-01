@@ -23,7 +23,7 @@ public class ConfiguracoesSeguranca {
     }
 
     @Bean
-    public SecurityFilterChain filtrosSerguraca(HttpSecurity http) throws Exception {
+    public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(
                         req -> {

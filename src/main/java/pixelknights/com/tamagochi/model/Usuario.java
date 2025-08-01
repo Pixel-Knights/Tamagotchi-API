@@ -28,6 +28,9 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario")
     private List<Tamagochi> tamagochis;
 
+    @Column()
+    private boolean ativado;
+
     public Usuario() {}
 
     public Usuario(UsuarioCriacaoDTO usuarioCriacaoDTO) {
@@ -35,12 +38,14 @@ public class Usuario implements UserDetails {
         usuario.userName = usuarioCriacaoDTO.userName();
         usuario.email = usuarioCriacaoDTO.email();
         usuario.senha = usuarioCriacaoDTO.senha();
+        usuario.ativado = true;
     }
 
     public Usuario(String userName, String email, String senhaCriptografada){
         this.userName = userName;
         this.email = email;
         this.senha = senhaCriptografada;
+        this.ativado = true;
     }
 
     public UsuarioDTO toUsuarioDTO(){
@@ -88,5 +93,13 @@ public class Usuario implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public boolean isAtivado() {
+        return ativado;
+    }
+
+    public void setAtivado(boolean ativado) {
+        this.ativado = ativado;
     }
 }

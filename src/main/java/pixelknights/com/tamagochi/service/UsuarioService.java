@@ -26,16 +26,6 @@ public class UsuarioService implements UserDetailsService {
     //CRUD - Create - Cria um novo usuário
     public UsuarioDTO save(UsuarioCriacaoDTO usuarioCriacaoDTO){
 
-        //Os campos do DTO são obrigatórios, caso estejam vazios, deve ser apontado erro
-        if (usuarioCriacaoDTO.userName() == null){
-            throw new BadRequestException("O Nome do usuário não pode estar vazio");
-        }
-        if (usuarioCriacaoDTO.email() == null){
-            throw new BadRequestException("O email do usuário não pode estar vazio");
-        }
-        if (usuarioCriacaoDTO.email().matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")){
-            throw new BadRequestException("O email do usuário não é valido");
-        }
         //Tenta salvar registro no banco e aponta erros se houver
         try {
             Usuario usuario = new Usuario(usuarioCriacaoDTO);
@@ -78,17 +68,6 @@ public class UsuarioService implements UserDetailsService {
 
         //procura um registro com mesmo ID do passado por requisição
         Optional<Usuario> findUsuario = usuarioRepository.findById(usuario.getId());
-
-        //Os campos do DTO são obrigatórios, caso estejam vazios, deve ser apontado erro
-        if (usuario.getUsername() == null){
-            throw new BadRequestException("O Nome do usuário não pode estar vazio");
-        }
-        if (usuario.getEmail() == null){
-            throw new BadRequestException("O email do usuário não pode estar vazio");
-        }
-        if (usuario.getEmail().matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")){
-            throw new BadRequestException("O email do usuário não é valido");
-        }
 
         //Se o registro já existe
         if (findUsuario.isPresent()){

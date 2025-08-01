@@ -2,9 +2,13 @@ package pixelknights.com.tamagochi.resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pixelknights.com.tamagochi.dto.TrocaSenhaDTO;
 import pixelknights.com.tamagochi.dto.UsuarioCriacaoDTO;
 import pixelknights.com.tamagochi.dto.UsuarioDTO;
+import pixelknights.com.tamagochi.infra.exception.IncorrectPasswordException;
 import pixelknights.com.tamagochi.model.Usuario;
 import pixelknights.com.tamagochi.service.UsuarioService;
 
@@ -17,51 +21,34 @@ public class UsuarioResource {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping// POST http://localhost:8080/api/usuario
-    public ResponseEntity<UsuarioDTO> save(@RequestBody UsuarioCriacaoDTO usuarioCriacaoDTO){
-
-        UsuarioDTO usuarioDTO = usuarioService.save(usuarioCriacaoDTO);
-
-        return ResponseEntity.ok(usuarioDTO);
-    }
-
-    @GetMapping("/{id}")// GET http://localhost:8080/api/usuario/{id}
-    public ResponseEntity<UsuarioDTO> findById(@PathVariable Long id){
-
-        UsuarioDTO usuarioDTO = usuarioService.findById(id);
-
-        return ResponseEntity.ok(usuarioDTO);
-    }
-
-    @GetMapping// GET http://localhost:8080/api/usuario
-    public  ResponseEntity<List<UsuarioDTO>> list(){
-
-        List<UsuarioDTO> usuarios = usuarioService.findAll();
-
-        if (usuarios.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
-        else{
-            return ResponseEntity.ok(usuarios);
-        }
-    }
-
     @PutMapping// PUT http://localhost:8080/api/usuario
-    public ResponseEntity<UsuarioDTO> update(@RequestBody Usuario updUsuario){
+    public ResponseEntity<UsuarioDTO> update(TrocaSenhaDTO dados){
 
-        usuarioService.update(updUsuario);
+        Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        UsuarioDTO usuarioDTO = updUsuario.toUsuarioDTO();
+        if (new BCryptPasswordEncoder().matches(dados.senhaAntiga(), usuarioLogado.getPassword())){
+            usuarioLogado.setSenha(dados.senhaNova());
+        }
+        else {
+            throw new IncorrectPasswordException("A senha está incorreta");
+        }
+
+        UsuarioDTO usuarioDTO = usuarioLogado.toUsuarioDTO();
 
         return ResponseEntity.ok(usuarioDTO);
     }
 
-    @DeleteMapping("/{id}")// DELETE http://localhost:8080/api/usuario{id}
-    public ResponseEntity<?> delete(@PathVariable Long id){
+    @PutMapping("/desativar")// PUT http://localhost:8080/api/usuario
+    public ResponseEntity<UsuarioDTO> update(){
 
-        usuarioService.delete(id);
+        Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        return ResponseEntity.noContent().build();
+        usuarioLogado.setAtivado(false);
+
+        usuarioService.update(usuarioLogado);
+
+        UsuarioDTO usuarioAtualizado = usuarioLogado.toUsuarioDTO();
+
+        return ResponseEntity.ok(usuarioAtualizado);
     }
-
 }
