@@ -23,46 +23,6 @@ public class UsuarioService implements UserDetailsService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    //CRUD - Create - Cria um novo usuário
-    public UsuarioDTO save(UsuarioCriacaoDTO usuarioCriacaoDTO){
-
-        //Tenta salvar registro no banco e aponta erros se houver
-        try {
-            Usuario usuario = new Usuario(usuarioCriacaoDTO);
-            usuarioRepository.save(usuario);
-            return usuario.toUsuarioDTO();
-        }
-        catch (Exception e){
-            throw new InternalServerException("Erro desconhecido ao criar usuario! " + e.getMessage());
-        }
-    }
-
-    //CRUD - Read - Retorna pessoa pelo ID
-    public UsuarioDTO findById(Long id){
-        try {
-            Usuario usuario = usuarioRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException("usuário com ID " + id + " não encontrado"));
-
-            return usuario.toUsuarioDTO();
-        } catch (NotFoundException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            throw new InternalServerException("Erro interno ao buscar usuário: " + e.getMessage());
-        }
-    }
-
-    //CRUD - Read - Retorna todos os registros de pessoa
-    public List<UsuarioDTO> findAll(){
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        List<UsuarioDTO> usuarioDTOS = new ArrayList<>();
-        for (Usuario usuario : usuarios){
-            UsuarioDTO usuarioDTO = usuario.toUsuarioDTO();
-            usuarioDTOS.add(usuarioDTO);
-        }
-        return usuarioDTOS;
-    }
-
     //CRUD - Update - Edita os dados de um registro ou cria um novo
     public UsuarioDTO update(Usuario usuario){
 
@@ -98,11 +58,6 @@ public class UsuarioService implements UserDetailsService {
                 throw new InternalServerException("Erro ao salvar novo usuário!");
             }
         }
-    }
-
-    //CRUD - Delete - Deeleta registro por ID
-    public void delete(Long id){
-        usuarioRepository.deleteById(id);
     }
 
     @Override
