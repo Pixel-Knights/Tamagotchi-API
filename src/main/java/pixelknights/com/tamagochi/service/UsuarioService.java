@@ -36,9 +36,10 @@ public class UsuarioService implements UserDetailsService {
             Usuario updUsuario = findUsuario.get();
 
             //Atualiza o registro existente com os dados novos
-            updUsuario.setUserName(usuario.getUsername());
+            updUsuario.setUserName(usuario.getUser());
             updUsuario.setEmail(usuario.getEmail());
             updUsuario.setSenha(usuario.getPassword());
+            updUsuario.setAtivado(usuario.isAtivado());
 
             //Tenta salvar registro no banco e aponta erros se houver
             try {

@@ -18,16 +18,22 @@ import java.util.List;
 @RequestMapping("/api/usuario")
 public class UsuarioResource {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
-    @PutMapping// PUT http://localhost:8080/api/usuario
-    public ResponseEntity<UsuarioDTO> update(TrocaSenhaDTO dados){
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public UsuarioResource(UsuarioService usuarioService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.usuarioService = usuarioService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    @PutMapping("/troca-senha")// PUT http://localhost:8080/api/usuario
+    public ResponseEntity<UsuarioDTO> update(@RequestBody TrocaSenhaDTO dados){
 
         Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (new BCryptPasswordEncoder().matches(dados.senhaAntiga(), usuarioLogado.getPassword())){
-            usuarioLogado.setSenha(dados.senhaNova());
+        if (bCryptPasswordEncoder.matches((CharSequence) dados.senhaAntiga(), usuarioLogado.getPassword())){
+            usuarioLogado.setSenha(bCryptPasswordEncoder.encode(dados.senhaNova()));
         }
         else {
             throw new IncorrectPasswordException("A senha está incorreta");
